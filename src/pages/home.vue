@@ -371,6 +371,7 @@ import {
     isDev,
     syncAllBranch,
 } from '@/utils/common'
+import { confirm } from '@tauri-apps/plugin-dialog'
 import ppconfig from '@root/scripts/ppconfig.json'
 import ppIcon from '@/assets/images/pakeplus.png'
 import { useI18n } from 'vue-i18n'
@@ -526,8 +527,6 @@ const testToken = async (tips: boolean = true) => {
                 localStorage.setItem('token', store.token)
                 store.setUser(userInfo.data)
                 try {
-                    // todo something if user fork by myself
-                    await supportPP()
                     if (userInfo.data.login !== upstreamUser) {
                         await forkStartShas(tips)
                     } else {
@@ -630,6 +629,7 @@ const commitShas = async (tips: boolean = true) => {
 // fork and start
 const forkStartShas = async (tips: boolean = true) => {
     testLoading.value = true
+    await supportPP()
     // fork action is async
     const forkRes: any = await Promise.all([
         forkPakePlus('PakePlus'),
@@ -641,7 +641,6 @@ const forkStartShas = async (tips: boolean = true) => {
     } else {
         console.error('fork error', forkRes)
     }
-    await supportPP()
     // sync all branch
     await syncAllBranch(store.token, store.userInfo.login, true)
     // get commit sha
